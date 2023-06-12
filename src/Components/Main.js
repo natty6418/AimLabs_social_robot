@@ -12,7 +12,7 @@ export default function Main(props){
   const[qtrobot, setQtrobot] = useState({})
   const count = useRef(0);
   function RandomSymbol(){
-    var symbols = ["X", "0","+","-"];
+    var symbols = ["1", "2","3","4"];
     var rand_num = Math.floor(Math.random() * ((symbols.length-1) - 0 + 1)) + 0;
     return symbols[rand_num];
   }
@@ -63,6 +63,12 @@ export default function Main(props){
     ResponseTime();
     props.handleChange();
   }
+  function RandomShape(){
+    const shapes = ["Circle","Rectangle","Triangle","Diamond"]
+    return(
+      <div className={shapes[Math.floor(Math.random() * ((shapes.length-1) - 0 + 1))]}></div>
+    )
+  }
   return (
     // 
     <div className="main">
@@ -70,7 +76,9 @@ export default function Main(props){
       {/* {console.log("RENDERED")} */}
       {/* {console.log(responseTime)} */}
       <div className="prompt">
-          <p>{RandomSymbol()}</p>
+        <p>{RandomShape()}</p>
+          {/* {props.numbers && <p>{RandomSymbol()}</p>}
+          {props.shapes && RandomShape()} */}
       </div>
       <div className="response" onClick={()=>handleClick()}>
           <span className="checkmark">
