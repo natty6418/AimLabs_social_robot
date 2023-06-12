@@ -1,6 +1,6 @@
 import React from 'react';
 export default function Header(props) {
-    console.log("here")
+    // console.log("here")
     return (
         <div className = "navBar">
           <h3>Aim Labs</h3>
