@@ -8,13 +8,18 @@ export default function App() {
   const [trial, setTrial] = React.useState(1)
   const [time, setTime] = useState(Date.now());
   const count = useRef(0);
-  const [responseTime, setResponseTime] = useState({0:Date.now()});
+  const [wrong, setWrong] = useState(false)
+  const [responseTime, setResponseTime] = useState({0: {'Time':Date.now(), 'Wrong': false}});
+  const experiment_no = 0
   function ResponseTime(){
     const currentTime = Date.now();
     count.current +=1;
     setResponseTime(prevResponseTime => ({
       ...prevResponseTime, 
-      [count.current]: Math.floor((currentTime - time))
+      [count.current]: {
+      'Time': Math.floor((currentTime - time)),
+      'Wrong': wrong
+      }
     }));
     setTime(Date.now())
       }
@@ -25,14 +30,18 @@ export default function App() {
     const link = document.createElement("a");
     const file = new Blob([JSON.stringify(responseTime)], { type: 'text/plain' });
     link.href = URL.createObjectURL(file);
-    link.download = "sample.txt";
+    link.download = `experiment ${experiment_no}`;
     link.click();
     URL.revokeObjectURL(link.href);
+    
+  }
+  function handleWrong(w){
+    setWrong(w)
   }
   return (
     <div className='app'>
       <Header trialNum={trial} />
-      {trial < 50 ? <Main handleChange = {incrementTrial} responseTime = {responseTime} ResponseTime = {ResponseTime}/> : 
+      {trial < 50 ? <Main handleChange = {incrementTrial} responseTime = {responseTime} ResponseTime = {ResponseTime} handleWrong = {handleWrong}/> : 
       (
         <div className='end-trail'>
           <h1>End of Trial.</h1>
