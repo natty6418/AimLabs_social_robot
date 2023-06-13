@@ -3,28 +3,15 @@ import {useState} from 'react';
 import { useEffect } from 'react';
 import {useRef} from 'react'
 // import QTrobot from './js/qtrobot-1.0.min.js';
-
-
 export default function Main(props){
-  const [time, setTime] = useState(Date.now());
-  const [responseTime, setResponseTime] = useState({0:Date.now()});
   const [url, setUrl] = useState(null)
   const[qtrobot, setQtrobot] = useState({})
-  const count = useRef(0);
   function RandomSymbol(){
     var symbols = ["1", "2","3","4"];
     var rand_num = Math.floor(Math.random() * ((symbols.length-1) - 0 + 1)) + 0;
     return symbols[rand_num];
   }
-  function ResponseTime(){
-    const currentTime = Date.now();
-    count.current +=1;
-    setResponseTime(prevResponseTime => ({
-      ...prevResponseTime, 
-      [count.current]: Math.floor((currentTime - time))
-    }));
-    setTime(Date.now())
-      }
+  
   useEffect(
     () => {
       var _url = prompt("Please enter QTrobot rosbridge url:", "ws://192.168.100.2:9091");
@@ -53,14 +40,14 @@ export default function Main(props){
   }, [url])
   useEffect(() => {
       const interval = setInterval(() => {
-      ResponseTime();
+      props.ResponseTime();
       props.handleChange();
     }, 1000);
     return () => clearInterval(interval);
-  },[responseTime])
+  },[props.responseTime])
   function handleClick() {
     qtrobot.show_emotion('QT/happy');
-    ResponseTime();
+    props.ResponseTime();
     props.handleChange();
   }
   function RandomShape(){

@@ -168,3 +168,13 @@ h3 {
   background: #D9D9D9;
   transform: rotate(-45deg);
 }
+.end-trail {
+  color: white;
+  font-family: Inter;
+  margin: auto;
+  margin-top: 25%;
+}
+.app{
+  display: flex;
+  flex-direction: column;
+}
