@@ -27,7 +27,7 @@ export default function Main(props){
     // eslint-disable-next-line no-undef
     setQtrobot(()=> new QTrobot({
       url : url,
-      connection: function(){            
+      connection: function(){    
           console.log("connected to " + url);        
       },
       error: function(error){
