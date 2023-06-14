@@ -50,9 +50,9 @@ export default function Main(props){
     return () => clearInterval(interval);
   },[props.responseTime])
   function handleClick() {
-    qtrobot.set_volume(25)
+    qtrobot.set_volume(15)
     qtrobot.show_emotion('QT/happy');
-    qtrobot.play_audio('QT/sample', '../audio')
+    qtrobot.talk_audio('QT/5LittleBunnies')
     props.ResponseTime();
     props.handleChange();
     target === randomElt ? props.handleWrong(false) : props.handleWrong(true);
