@@ -6,6 +6,9 @@ import {useRef} from 'react'
 export default function Main(props){
   const [url, setUrl] = useState(null)
   const[qtrobot, setQtrobot] = useState({})
+  const shapes = ["Circle","Rectangle","Triangle","Diamond"]
+  const target = "Triangle"
+  let randomElt= ""
   function RandomSymbol(){
     var symbols = ["1", "2","3","4"];
     var rand_num = Math.floor(Math.random() * ((symbols.length-1) - 0 + 1)) + 0;
@@ -42,20 +45,27 @@ export default function Main(props){
       const interval = setInterval(() => {
       props.ResponseTime();
       props.handleChange();
+      target === randomElt ? props.handleWrong(true) : props.handleWrong(false);
     }, 1000);
     return () => clearInterval(interval);
   },[props.responseTime])
   function handleClick() {
+    qtrobot.set_volume(15)
     qtrobot.show_emotion('QT/happy');
+    qtrobot.talk_audio('QT/5LittleBunnies')
     props.ResponseTime();
     props.handleChange();
+    target === randomElt ? props.handleWrong(false) : props.handleWrong(true);
   }
   function RandomShape(){
-    const shapes = ["Circle","Rectangle","Triangle","Diamond"]
+    randomElt = shapes[Math.floor(Math.random() * ((shapes.length-1) - 0 + 1))]
     return(
-      <div className={shapes[Math.floor(Math.random() * ((shapes.length-1) - 0 + 1))]}></div>
+      <div className={randomElt}></div>
     )
   }
+  // while (qtrobot != null){
+  //   qtrobot.set_volume(20)
+  // }
   return (
     // 
     <div className="main">
@@ -63,7 +73,7 @@ export default function Main(props){
       {/* {console.log("RENDERED")} */}
       {/* {console.log(responseTime)} */}
       <div className="prompt">
-        <p>{RandomShape()}</p>
+        {RandomShape()}
           {/* {props.numbers && <p>{RandomSymbol()}</p>}
           {props.shapes && RandomShape()} */}
       </div>
