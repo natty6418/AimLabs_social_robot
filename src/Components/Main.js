@@ -1,9 +1,11 @@
 import React from 'react';
 import {useState} from 'react';
 import { useEffect } from 'react';
-import {useRef} from 'react'
+import {useRef} from 'react';
+import play from '../Images/play.png' 
 // import QTrobot from './js/qtrobot-1.0.min.js';
 export default function Main(props){
+  const [start, setStart] = useState(false)
   const [url, setUrl] = useState(null)
   const[qtrobot, setQtrobot] = useState({})
   const shapes = ["Circle","Rectangle","Triangle","Diamond"]
@@ -30,7 +32,7 @@ export default function Main(props){
     // eslint-disable-next-line no-undef
     setQtrobot(()=> new QTrobot({
       url : url,
-      connection: function(){            
+      connection: function(){    
           console.log("connected to " + url);        
       },
       error: function(error){
@@ -42,12 +44,14 @@ export default function Main(props){
     }))
   }, [url])
   useEffect(() => {
+    if(start) {
       const interval = setInterval(() => {
-      props.ResponseTime();
-      props.handleChange();
-      target === randomElt ? props.handleWrong(true) : props.handleWrong(false);
-    }, 1000);
-    return () => clearInterval(interval);
+        props.ResponseTime();
+        // props.handleChange();
+        target === randomElt ? props.handleWrong(true) : props.handleWrong(false);
+      }, 1000);
+      return () => clearInterval(interval);
+    } 
   },[props.responseTime])
   function handleClick() {
     qtrobot.set_volume(50)
@@ -56,7 +60,7 @@ export default function Main(props){
     // qtrobot.show_emotion('QT/with_a_cold_sneezing', qtrobot.talk_text('achoo'));
     // qtrobot.play_audio('sample', '/home/qtrobot/AimLabs_social_robot/src/audio')
     props.ResponseTime();
-    props.handleChange();
+    // props.handleChange();
     target === randomElt ? props.handleWrong(false) : props.handleWrong(true);
   }
   function RandomShape(){
@@ -65,15 +69,15 @@ export default function Main(props){
       <div className={randomElt}></div>
     )
   }
-  // while (qtrobot != null){
-  //   qtrobot.set_volume(20)
-  // }
+  function handleStart(){
+    // console.log("dhdjkhd")
+    setStart(true);
+    props.setTime(Date.now());
+    props.ResponseTime();
+  }
   return (
-    // 
-    <div className="main">
-      {/* <h1>hello!!!</h1> */}
-      {/* {console.log("RENDERED")} */}
-      {/* {console.log(responseTime)} */}
+    !start ? <img className='play-btn' onClick={()=>handleStart()} src={play}/> :
+    <div className='main'>
       <div className="prompt">
         {RandomShape()}
           {/* {props.numbers && <p>{RandomSymbol()}</p>}
