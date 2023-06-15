@@ -46,6 +46,7 @@ h3 {
   /* height: auto; */
   display: flex; 
   align-item:center;
+  justify-content: center;
   flex-direction: column;
   margin: auto;
   padding: 45px;
@@ -58,13 +59,13 @@ h3 {
   justify-content: center;
   align-items: center;
   margin: auto;
-  margin-bottom: 10px;
+  margin-bottom: 0px;
   height: 400px;
   /* background-color: white; */
   width:400px;
   /* border: 1px solid black; */
   /* opacity: 0.3; */
-  border-radius: 10px;
+  border-radius: 10px 10px 0px 0px;
   background: rgba(255, 255, 255, 0.2); 
   backdrop-filter: blur(5px);
   text-align: center;
@@ -85,6 +86,7 @@ h3 {
 }
 .response {
   margin: auto;
+  margin-top: 100px;
   height: 150px;
   background: rgb(4,15,34);
   background: linear-gradient(30deg, rgba(4,15,34,0.9573880577621674) 18%, rgba(64,72,74,1) 54%, rgba(192,192,192,1) 100%);
@@ -190,4 +192,21 @@ h3 {
   background: lightblue;
   font-family: Inter;
   margin-top: 5px;
+}
+.play-btn {
+  margin:auto;
+  margin-top:25%;
+  height: 400px;
+  width:400px;
+  align-self: cetner;
+  justify-self: center;
+}
+.visual-time {
+  height: 10px;
+  background: rgba(192,192,192,1);
+  margin: auto;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  width: 400px;
+  justify-self: center;
 }
