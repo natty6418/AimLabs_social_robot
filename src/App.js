@@ -45,7 +45,7 @@ export default function App() {
       (
         <div className='end-trail'>
           <h1>End of Trial.</h1>
-          <button onClick={()=>download()}>Download</button>
+          <button className='download-btn' onClick={()=>download()}>Download</button>
         </div>
         )}
     </div>

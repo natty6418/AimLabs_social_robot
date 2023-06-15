@@ -50,9 +50,11 @@ export default function Main(props){
     return () => clearInterval(interval);
   },[props.responseTime])
   function handleClick() {
-    qtrobot.set_volume(15)
-    qtrobot.show_emotion('QT/happy');
-    qtrobot.talk_audio('QT/5LittleBunnies')
+    qtrobot.set_volume(50)
+    qtrobot.call_service('/qt_robot/audio/play', '/qt_robot_interface/audio_play',{"filename": 'sample', "filepath": '../audio/'})
+    // qtrobot.home_motors()
+    // qtrobot.show_emotion('QT/with_a_cold_sneezing', qtrobot.talk_text('achoo'));
+    // qtrobot.play_audio('sample', '/home/qtrobot/AimLabs_social_robot/src/audio')
     props.ResponseTime();
     props.handleChange();
     target === randomElt ? props.handleWrong(false) : props.handleWrong(true);
