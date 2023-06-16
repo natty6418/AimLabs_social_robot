@@ -40,10 +40,11 @@ export default function App() {
   function handleWrong(w) {
     setWrong(w);
   }
+  // Greetings and introduction
   return (
     <div className="app">
       <Header trialNum={trial}/>
-      {trial <= 20 ? (
+      {trial < 50 ? (
         <Main
           setTime={setTime}
           responseTime={responseTime}
