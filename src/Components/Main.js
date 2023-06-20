@@ -1,93 +1,168 @@
-import React from 'react';
-import {useState} from 'react';
-import { useEffect } from 'react';
-import {useRef} from 'react';
-import play from '../Images/play.png' 
+import React from "react";
+import { useState } from "react";
+import { useEffect } from "react";
+import { useRef } from "react";
+import play from "../Images/play.png";
 // import QTrobot from './js/qtrobot-1.0.min.js';
-export default function Main(props){
-  const [start, setStart] = useState(false)
-  const [url, setUrl] = useState(null)
-  const[qtrobot, setQtrobot] = useState({})
-  const shapes = ["Circle","Rectangle","Triangle","Diamond"]
-  const target = "Triangle"
-  let randomElt= ""
-  function RandomSymbol(){
-    var symbols = ["1", "2","3","4"];
-    var rand_num = Math.floor(Math.random() * ((symbols.length-1) - 0 + 1)) + 0;
+
+//randomize the distructions
+export default function Main(props) {
+  const [start, setStart] = useState(false);
+  const [url, setUrl] = useState(null);
+  const [qtrobot, setQtrobot] = useState({});
+  const [timerWidth, setTimerWidth] = useState(400)
+  const [randomShape, setRandomShape] = useState(
+    <div className={"Circle"} style={{"background-color":"#ECE5C7"}}></div>
+  );
+  const shapes = ["Circle", "Rectangle", "Triangle", "Diamond"];
+  const colors = ["#C2DEDC","#ECE5C7","#B3C890","#116A7B"]
+  const target = "Triangle";
+  const distructions = ["yawn","sneeze","sing"]
+  const randomElt = useRef("");
+  function RandomSymbol() {
+    var symbols = ["1", "2", "3", "4"];
+    var rand_num = Math.floor(Math.random() * (symbols.length - 1 - 0 + 1)) + 0;
     return symbols[rand_num];
   }
-  
-  useEffect(
-    () => {
-      var _url = prompt("Please enter QTrobot rosbridge url:", "ws://192.168.100.2:9091");
-      _url = (_url == null) ? 'ws://127.0.0.1:9091' : _url;
-      if (url !== _url){
-        setUrl(_url)
-      }
-      console.log("connecting to QTrobot (please wait...)");
-      
-    }, []
-  )
-  useEffect(()=>{
-    // eslint-disable-next-line no-undef
-    setQtrobot(()=> new QTrobot({
-      url : url,
-      connection: function(){    
-          console.log("connected to " + url);        
-      },
-      error: function(error){
-          console.log(error);
-      },
-      close: function(){
-          console.log("disconnected.");
-      }
-    }))
-  }, [url])
+
   useEffect(() => {
-    if(start) {
+    var _url = prompt(
+      "Please enter QTrobot rosbridge url:",
+      "ws://192.168.100.2:9091"
+    );
+    _url = _url == null ? "ws://127.0.0.1:9091" : _url;
+    if (url !== _url) {
+      setUrl(_url);
+    }
+    console.log("connecting to QTrobot (please wait...)");
+  }, []);
+  useEffect(() => {
+    // eslint-disable-next-line no-undef
+    setQtrobot(() => new QTrobot({
+          url: url,
+          connection: function () {
+            console.log("connected to " + url);
+          },
+          error: function (error) {
+            console.log(error);
+          },
+          close: function () {
+            console.log("disconnected.");
+          },
+        })
+    );
+  }, [url]);
+  useEffect(() => {
+    if (start) {
+      qtrobot.set_volume(20);
       const interval = setInterval(() => {
+        setRandomShape(() => RandomShape());
         props.ResponseTime();
         // props.handleChange();
-        target === randomElt ? props.handleWrong(true) : props.handleWrong(false);
+        target === randomElt
+          ? props.handleWrong(true)
+          : props.handleWrong(false);
+        setTimerWidth(400);
       }, 1000);
-      return () => clearInterval(interval);
-    } 
-  },[props.responseTime])
+      const visual_interval = setInterval(() => {
+        setTimerWidth((prev) => prev - 4);
+      }, 10);
+      return () => {
+        clearInterval(interval);
+        clearInterval(visual_interval);
+      };
+    }
+  }, [props.responseTime]);
+  useEffect(() => {
+    if(start){
+    const interval = setRandomInterval(randomDistruction, 30000, 45000);
+    return () => {
+      interval.clear();
+    };
+  }
+  }, [start]);
+  const setRandomInterval = (intervalFunction, minDelay, maxDelay) => {
+    let timeout;
+  
+    const runInterval = () => {
+      const timeoutFunction = () => {
+        intervalFunction();
+        runInterval();
+      };
+  
+      const delay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
+  
+      timeout = setTimeout(timeoutFunction, delay);
+    };
+  
+    runInterval();
+  
+    return {
+      clear() { clearTimeout(timeout) },
+    };
+  };
+  function randomDistruction(){
+    let distruction = distructions[Math.floor(Math.random() * (distructions.length - 1 - 0 + 1))];
+    qtrobot.call_service('/qt_robot/audio/stop')
+    switch (distruction) {
+      case "yawn":
+        qtrobot.show_emotion('QT/yawn', qtrobot.play_gesture('QT/yawn'));
+        break;
+      case "sneeze":
+        qtrobot.show_emotion('QT/with_a_cold_sneezing',qtrobot.play_audio('sneeze'));
+        break;
+      case "sing":
+        qtrobot.play_audio('QT/5LittleBunnies')
+        break;
+      default:
+        qtrobot.show_emotion('yawn')
+    }
+  }
   function handleClick() {
-    qtrobot.set_volume(15)
-    qtrobot.show_emotion('QT/happy');
-    qtrobot.talk_audio('QT/5LittleBunnies')
+    // qtrobot.play_audio('sneeze');
+    //qtrobot.show_emotion('QT/with_a_cold_sneezing',qtrobot.play_audio('sneeze'));
     props.ResponseTime();
-    // props.handleChange();
-    target === randomElt ? props.handleWrong(false) : props.handleWrong(true);
+    target === randomElt.current
+      ? props.handleWrong(false)
+      : props.handleWrong(true);
+    setRandomShape(() => RandomShape());
+    setTimerWidth(400);
   }
-  function RandomShape(){
-    randomElt = shapes[Math.floor(Math.random() * ((shapes.length-1) - 0 + 1))]
-    return(
-      <div className={randomElt}></div>
-    )
+  function RandomShape() {
+    let random_color = 
+      colors[Math.floor(Math.random()*(colors.length))]
+    randomElt.current =
+      shapes[Math.floor(Math.random() * (shapes.length - 1 - 0 + 1))];
+    return <div className={randomElt.current} style={(randomElt.current === "Triangle")?
+    {"border-bottom": `150px solid ${random_color}`}
+    :{"background-color": random_color}}>
+    </div>;
   }
-  function handleStart(){
+  function handleStart() {
     // console.log("dhdjkhd")
     setStart(true);
     props.setTime(Date.now());
     props.ResponseTime();
   }
-  return (
-    !start ? <img className='play-btn' onClick={()=>handleStart()} src={play}/> :
-    <div className='main'>
+  return !start ? (
+    <div className="main">
+    <img className="play-btn" onClick={() => handleStart()} src={play} />
+    </div>
+  ) : (
+    <div className="main">
       <div className="prompt">
-        {RandomShape()}
-          {/* {props.numbers && <p>{RandomSymbol()}</p>}
+        {randomShape}
+        {/* {props.numbers && <p>{RandomSymbol()}</p>}
           {props.shapes && RandomShape()} */}
       </div>
-      <div className="response" onClick={()=>handleClick()}>
-          <span className="checkmark">
-            {/* <div className="checkmark_circle"></div> */}
-            <div className="checkmark_stem"></div>
-            <div className="checkmark_kick"></div>
-          </span>
+      <div className="visual-time" style={{ width: `${timerWidth}px` }}></div>
+      <div className="response" onClick={() => handleClick()}>
+        <span className="checkmark">
+          {/* <div className="checkmark_circle"></div> */}
+          <div className="checkmark_stem"></div>
+          <div className="checkmark_kick"></div>
+        </span>
       </div>
     </div>
-  )
+  );
 }
