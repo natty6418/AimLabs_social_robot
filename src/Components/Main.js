@@ -11,14 +11,18 @@ export default function Main(props) {
   const [url, setUrl] = useState(null);
   const [qtrobot, setQtrobot] = useState({});
   const [timerWidth, setTimerWidth] = useState(400)
-  const [randomShape, setRandomShape] = useState(
-    <div className={"Circle"} style={{"background-color":"#ECE5C7"}}></div>
-  );
+  const [randomShape, setRandomShape] = useState("");
   const shapes = ["Circle", "Rectangle", "Triangle", "Diamond"];
-  const colors = ["#C2DEDC","#ECE5C7","#B3C890","#116A7B"]
-  const target = "Triangle";
-  const distructions = ["yawn","sneeze","sing"]
-  const randomElt = useRef("");
+  // const colors = ["#C2DEDC", "#ECE5C7", "#B3C890", "#116A7B"]
+  const colors = ["green", "yellow", "red", "blue"]
+
+  const distructions = ["yawn", "sneeze", "sing"]
+  const randomElt = useRef({"shape": "", "color": "", "prevShape": "", "prevColor": ""});
+  // const [randomColor, setRandomColor] = useState("");
+  // const prevRandomColor = useRef("")
+  // const prevRandomElt = useRef("");
+  const startRef = useRef();
+
   function RandomSymbol() {
     var symbols = ["1", "2", "3", "4"];
     var rand_num = Math.floor(Math.random() * (symbols.length - 1 - 0 + 1)) + 0;
@@ -39,30 +43,33 @@ export default function Main(props) {
   useEffect(() => {
     // eslint-disable-next-line no-undef
     setQtrobot(() => new QTrobot({
-          url: url,
-          connection: function () {
-            console.log("connected to " + url);
-          },
-          error: function (error) {
-            console.log(error);
-          },
-          close: function () {
-            console.log("disconnected.");
-          },
-        })
+      url: url,
+      connection: function () {
+        console.log("connected to " + url);
+      },
+      error: function (error) {
+        console.log(error);
+      },
+      close: function () {
+        console.log("disconnected.");
+      },
+    })
     );
   }, [url]);
   useEffect(() => {
+    console.log(randomElt)
+    // setRandomShape(() => RandomShape())
     if (start) {
       qtrobot.set_volume(20);
       const interval = setInterval(() => {
+        if (randomElt.current.shape === randomElt.current.prevShape || randomElt.current.color === randomElt.current.prevColor){
+          props.handleWrong("Incorrect Pass")
+          } else {
+          props.handleWrong("Correct Pass");
+          setTimerWidth(400);
+          }
         setRandomShape(() => RandomShape());
-        props.ResponseTime();
-        // props.handleChange();
-        target === randomElt
-          ? props.handleWrong(true)
-          : props.handleWrong(false);
-        setTimerWidth(400);
+        props.ResponseTime();        
       }, 1000);
       const visual_interval = setInterval(() => {
         setTimerWidth((prev) => prev - 4);
@@ -70,38 +77,44 @@ export default function Main(props) {
       return () => {
         clearInterval(interval);
         clearInterval(visual_interval);
+        setTimerWidth(400);
+      };
+    } else {
+      setRandomShape(() => RandomShape())
+    }
+  }, [props.trial]);
+  useEffect(() => {
+    if (start) {
+      const randomInterval = setRandomInterval(randomDistruction, 30000, 45000);
+      return () => {
+        randomInterval.clear();
       };
     }
-  }, [props.responseTime]);
-  useEffect(() => {
-    if(start){
-    const interval = setRandomInterval(randomDistruction, 30000, 45000);
-    return () => {
-      interval.clear();
-    };
-  }
   }, [start]);
+ // useEffect (() => {
+  //   document.addEventListener('keydown', handleKeyDown, true);
+  // }, []) 
   const setRandomInterval = (intervalFunction, minDelay, maxDelay) => {
     let timeout;
-  
+
     const runInterval = () => {
       const timeoutFunction = () => {
         intervalFunction();
         runInterval();
       };
-  
+
       const delay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
-  
+
       timeout = setTimeout(timeoutFunction, delay);
     };
-  
+
     runInterval();
-  
+
     return {
       clear() { clearTimeout(timeout) },
     };
   };
-  function randomDistruction(){
+  function randomDistruction() {
     let distruction = distructions[Math.floor(Math.random() * (distructions.length - 1 - 0 + 1))];
     qtrobot.call_service('/qt_robot/audio/stop')
     switch (distruction) {
@@ -109,35 +122,54 @@ export default function Main(props) {
         qtrobot.show_emotion('QT/yawn', qtrobot.play_gesture('QT/yawn'));
         break;
       case "sneeze":
-        qtrobot.show_emotion('QT/with_a_cold_sneezing',qtrobot.play_audio('sneeze'));
+        qtrobot.show_emotion('QT/with_a_cold_sneezing', qtrobot.play_audio('sneeze'));
         break;
       case "sing":
-        qtrobot.play_audio('QT/5LittleBunnies')
+        qtrobot.talk_audio('QT/5LittleBunnies')
         break;
       default:
         qtrobot.show_emotion('yawn')
     }
   }
   function handleClick() {
+    console.log(randomElt)
     // qtrobot.play_audio('sneeze');
     //qtrobot.show_emotion('QT/with_a_cold_sneezing',qtrobot.play_audio('sneeze'));
     props.ResponseTime();
-    target === randomElt.current
-      ? props.handleWrong(false)
-      : props.handleWrong(true);
+    (randomElt.current.shape === randomElt.current.prevShape || randomElt.current.color === randomElt.current.prevColor
+    ) ? props.handleWrong("Correct Click")
+      : props.handleWrong("Incorrect Click");
     setRandomShape(() => RandomShape());
     setTimerWidth(400);
   }
+  function handleKeyDown(e) {
+    if (start){
+    e.preventDefault();
+    // console.log(e);
+    if (e.key === "Enter" || e.key === " "){
+      // console.log(e.key)
+      handleClick();
+      setTimerWidth(400);
+    }}
+    else {
+      e.preventDefault();
+      handleStart();
+      setTimerWidth(400);
+    }
+  }
   function RandomShape() {
-    let random_color = 
-      colors[Math.floor(Math.random()*(colors.length))]
-    randomElt.current =
-      shapes[Math.floor(Math.random() * (shapes.length - 1 - 0 + 1))];
-    return <div className={randomElt.current} style={(randomElt.current === "Triangle")?
-    {"border-bottom": `150px solid ${random_color}`}
-    :{"background-color": random_color}}>
+    randomElt.current = ({
+      "shape": shapes[Math.floor(Math.random() * (shapes.length))],
+      "color": colors[Math.floor(Math.random() * (colors.length))],
+      "prevShape": randomElt.current.shape,
+      "prevColor": randomElt.current.color
+    })
+    return <div className={randomElt.current.shape} style={(randomElt.current.shape === "Triangle") ?
+      { "border-bottom": `150px solid ${randomElt.current.color}` }
+      : { "background-color": randomElt.current.color }}>
     </div>;
   }
+  
   function handleStart() {
     // console.log("dhdjkhd")
     setStart(true);
@@ -146,7 +178,7 @@ export default function Main(props) {
   }
   return !start ? (
     <div className="main">
-    <img className="play-btn" onClick={() => handleStart()} src={play} />
+      <img className="play-btn" onClick={() => handleStart()} src={play} alt="play"/>
     </div>
   ) : (
     <div className="main">

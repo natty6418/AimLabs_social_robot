@@ -97,6 +97,9 @@ h3 {
   box-shadow: 0px 0px 30px gray;
   transition: width 0.1s, height 0.3s;
 }
+.response:focus {
+  box-shadow: 0px 0px 30px green;
+}
 
 .checkmark {
   display: flex;
