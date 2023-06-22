@@ -32,15 +32,14 @@ export default function App() {
   //   setTrial((prev) => prev + 1);
   // }
   function download() {
-    // const link = document.createElement("a");
-    // const file = new Blob([JSON.stringify(responseTime)], {
-    //   type: "text/plain",
-    // });
-    // link.href = URL.createObjectURL(file);
-    // link.download = `experiment ${experiment_no}.txt`;
-    // link.click();
-    // URL.revokeObjectURL(link.href);
-    console.log(responseTime)
+    const link = document.createElement("a");
+    const file = new Blob([JSON.stringify(responseTime)], {
+      type: "text/plain",
+    });
+    link.href = URL.createObjectURL(file);
+    link.download = `experiment ${experiment_no}.txt`;
+    link.click();
+    URL.revokeObjectURL(link.href);
   }
   function handleWrong(w) {
     setWrong(w);
@@ -49,7 +48,7 @@ export default function App() {
   return (
     <div className="app">
       <Header trialNum={trial}/>
-      {trial < 5 +1 ? (
+      {trial < 180 +1 ? (
         <Main
           
           setTime={setTime}

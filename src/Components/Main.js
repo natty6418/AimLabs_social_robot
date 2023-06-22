@@ -13,8 +13,8 @@ export default function Main(props) {
   const [timerWidth, setTimerWidth] = useState(400)
   const [randomShape, setRandomShape] = useState("");
   const shapes = ["Circle", "Rectangle", "Triangle", "Diamond"];
-  // const colors = ["#C2DEDC", "#ECE5C7", "#B3C890", "#116A7B"]
-  const colors = ["green", "yellow", "red", "blue"]
+  const colors = ["#C2DEDC", "#ECE5C7", "#B3C890", "#116A7B"]
+  //const colors = ["green", "yellow", "red", "blue"]
 
   const distructions = ["yawn", "sneeze", "sing"]
   const randomElt = useRef({"shape": "", "color": "", "prevShape": "", "prevColor": ""});
@@ -57,7 +57,7 @@ export default function Main(props) {
     );
   }, [url]);
   useEffect(() => {
-    console.log(randomElt)
+    // console.log(randomElt)
     // setRandomShape(() => RandomShape())
     if (start) {
       qtrobot.set_volume(20);
@@ -91,9 +91,11 @@ export default function Main(props) {
       };
     }
   }, [start]);
- // useEffect (() => {
-  //   document.addEventListener('keydown', handleKeyDown, true);
-  // }, []) 
+ useEffect (() => {
+    document.addEventListener('keydown', handleKeyDown, true);
+
+    return () => document.removeEventListener('keydown', handleKeyDown,true)
+  }, [start, props.trial]) 
   const setRandomInterval = (intervalFunction, minDelay, maxDelay) => {
     let timeout;
 
@@ -132,7 +134,7 @@ export default function Main(props) {
     }
   }
   function handleClick() {
-    console.log(randomElt)
+    // console.log(randomElt)
     // qtrobot.play_audio('sneeze');
     //qtrobot.show_emotion('QT/with_a_cold_sneezing',qtrobot.play_audio('sneeze'));
     props.ResponseTime();
@@ -143,11 +145,13 @@ export default function Main(props) {
     setTimerWidth(400);
   }
   function handleKeyDown(e) {
+    console.log(e.key)
+    console.log(start)
     if (start){
     e.preventDefault();
-    // console.log(e);
+    console.log(e);
     if (e.key === "Enter" || e.key === " "){
-      // console.log(e.key)
+      
       handleClick();
       setTimerWidth(400);
     }}
