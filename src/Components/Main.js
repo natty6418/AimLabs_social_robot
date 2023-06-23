@@ -16,7 +16,7 @@ export default function Main(props) {
   const colors = ["#C2DEDC", "#ECE5C7", "#B3C890", "#116A7B"]
   //const colors = ["green", "yellow", "red", "blue"]
 
-  const distructions = ["yawn", "sneeze", "sing"]
+  const distructions = useRef(["yawn", "sneeze", "sing"])
   const randomElt = useRef({"shape": "", "color": "", "prevShape": "", "prevColor": ""});
   // const [randomColor, setRandomColor] = useState("");
   // const prevRandomColor = useRef("")
@@ -59,6 +59,8 @@ export default function Main(props) {
   useEffect(() => {
     // console.log(randomElt)
     // setRandomShape(() => RandomShape())
+    //how do i make it so that there is only 1 distruction per minute?
+    //
     if (start) {
       qtrobot.set_volume(20);
       const interval = setInterval(() => {
@@ -78,60 +80,75 @@ export default function Main(props) {
         clearInterval(interval);
         clearInterval(visual_interval);
         setTimerWidth(400);
+        console.log("unmounted")
       };
     } else {
       setRandomShape(() => RandomShape())
     }
   }, [props.trial]);
   useEffect(() => {
-    if (start) {
-      const randomInterval = setRandomInterval(randomDistruction, 30000, 45000);
+    if(start) {
+      const oneMinInterval = setInterval(() => {
+      const randomInterval = setRandomInterval(randomDistruction, 3000, 8000);
       return () => {
         randomInterval.clear();
       };
+    }, 10000);
+    return () => {
+      clearInterval(oneMinInterval)
+    }}
+  },[start, distructions])
+  useEffect(() => {
+    if (start) {
+      console.log("here")
+      const startingRandomInterval = setRandomInterval(randomDistruction, 3000, 8000);
+      return () => {
+        startingRandomInterval.clear();
+      }; 
     }
   }, [start]);
- useEffect (() => {
+  useEffect (() => {
     document.addEventListener('keydown', handleKeyDown, true);
 
     return () => document.removeEventListener('keydown', handleKeyDown,true)
-  }, [start, props.trial]) 
+  }, [start, props.trial]); 
   const setRandomInterval = (intervalFunction, minDelay, maxDelay) => {
     let timeout;
-
-    const runInterval = () => {
-      const timeoutFunction = () => {
-        intervalFunction();
-        runInterval();
-      };
-
-      const delay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
-
-      timeout = setTimeout(timeoutFunction, delay);
+    const timeoutFunction = () => {
+      intervalFunction();
     };
-
-    runInterval();
-
+    const delay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
+    timeout = setTimeout(timeoutFunction, delay);
     return {
       clear() { clearTimeout(timeout) },
     };
   };
   function randomDistruction() {
-    let distruction = distructions[Math.floor(Math.random() * (distructions.length - 1 - 0 + 1))];
-    qtrobot.call_service('/qt_robot/audio/stop')
+    let distruction = distructions.current[Math.floor(Math.random() * (distructions.current.length - 1 - 0 + 1))];
+    distructions.current = distructions.current.splice(distructions.current.indexOf(distruction),1)
+    console.log(`distruction: ${distruction}`)
     switch (distruction) {
       case "yawn":
         qtrobot.show_emotion('QT/yawn', qtrobot.play_gesture('QT/yawn'));
+        logDistruction("yawn")
         break;
       case "sneeze":
         qtrobot.show_emotion('QT/with_a_cold_sneezing', qtrobot.play_audio('sneeze'));
+        logDistruction("sneeze")
         break;
       case "sing":
-        qtrobot.talk_audio('QT/5LittleBunnies')
+        qtrobot.talk_audio('QT/5LittleBunnies');
+        logDistruction("sing")
         break;
       default:
         qtrobot.show_emotion('yawn')
     }
+  }
+  function logDistruction(type){
+    props.handleDistructionData((prev) => ({
+      ...prev,
+      [type] : Date.now() - prev.startTime
+    }))
   }
   function handleClick() {
     // console.log(randomElt)
@@ -177,6 +194,10 @@ export default function Main(props) {
   function handleStart() {
     // console.log("dhdjkhd")
     setStart(true);
+    props.handleDistructionData((prev) => ({
+      ...prev,
+      "startTime": Date.now()
+    }));
     props.setTime(Date.now());
     props.ResponseTime();
   }
