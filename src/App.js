@@ -5,7 +5,7 @@ import "./App.css";
 import Header from "./Components/Header";
 import Main from "./Components/Main";
 export default function App() {
-  let numOfTrials = 18;
+  let numOfTrials = 180;
   const [trial, setTrial] = React.useState(0);
   const [time, setTime] = useState(Date.now());
   const [wrong, setWrong] = useState("");
@@ -15,11 +15,8 @@ export default function App() {
   const [distructionData, setDistructionData] = useState({"startTime": 0, "endTime": 0, "yawn": 0, "sneeze": 0, "sing": 0})
   const experiment_no = 0;
   function ResponseTime() {
-    // console.log("here")
     const currentTime = Date.now();
-    // console.log(`Trial: ${trial}`)
     setTrial((prev) => prev + 1);
-    // console.log(`Trial: ${trial}`)
     setResponseTime((prevResponseTime) => ({
       ...prevResponseTime,
       [trial]: {
@@ -27,16 +24,12 @@ export default function App() {
         Wrong: wrong,
       },
     }));
-    // console.log(responseTime)
     setTime(Date.now());
     trial === numOfTrials && setDistructionData(prev => ({
       ...prev,
       "endTime": Date.now()
     }))
   }
-  // function incrementTrial() {
-  //   setTrial((prev) => prev + 1);
-  // }
   function download() {
     const link = document.createElement("a");
     const file = new Blob([JSON.stringify(responseTime)+JSON.stringify(distructionData)], {
