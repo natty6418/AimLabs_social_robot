@@ -196,6 +196,15 @@ h3 {
   font-family: Inter;
   margin-top: 5px;
 }
+.heatmap-btn {
+  width: auto;
+  height: 30px;
+  border: none;
+  border-radius: 5px;
+  background: lightblue;
+  font-family: Inter;
+  margin-top: 5px;
+}
 .play-btn {
   margin:auto;
   /* margin-top:25%; */
@@ -212,4 +221,19 @@ h3 {
   margin-bottom: 0px;
   width: 400px;
   justify-self: center;
+}
+
+.loader {
+  border: 16px solid #f3f3f3; /* Light grey */
+  border-top: 16px solid rgba(64,72,74,1); /* Blue */
+  border-radius: 50%;
+  width: 200px;
+  height: 200px;
+  animation: spin 2s linear infinite;
+  margin:auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

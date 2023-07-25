@@ -3,29 +3,32 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { useRef } from "react";
 import play from "../Images/play.png";
-// import QTrobot from './js/qtrobot-1.0.min.js';
 
+//import QTrobot from './js/qtrobot-1.0.min.js';
 //randomize the distructions
 //make 20% of the shapes target per minute
 export default function Main(props) {
   const [start, setStart] = useState(false);
   const [url, setUrl] = useState(null);
   const [qtrobot, setQtrobot] = useState({});
-  const [timerWidth, setTimerWidth] = useState(400)
+  const [timerWidth, setTimerWidth] = useState(400);
+
+  
   const [randomShape, setRandomShape] = useState("");
-  const shapes = ["Circle", "Rectangle", "Triangle", "Diamond"];
-  const colors = ["#C2DEDC", "#ECE5C7", "#B3C890", "#116A7B"]
-  //const colors = ["green", "yellow", "red", "blue"]
+  // const shapes = ["Circle", "Rectangle", "Triangle", "Diamond"];
+  // const colors = ["#C2DEDC", "#ECE5C7", "#B3C890", "#116A7B"];
+  // //const colors = ["green", "yellow", "red", "blue"]
 
   const distructions = useRef(["yawn", "sneeze", "sing"])
-  const randomElt = useRef({"shape": "", "color": "", "prevShape": "", "prevColor": "", "nextShape": "", "nextColor":""});
-  const count = useRef(0);
-  function RandomSymbol() {
-    var symbols = ["1", "2", "3", "4"];
-    var rand_num = Math.floor(Math.random() * (symbols.length - 1 - 0 + 1)) + 0;
-    return symbols[rand_num];
-  }
-
+  const [randomElt, setRandomElt] = useState("");
+  // console.log("props: ", props.trials)
+  // const count = useRef(0);
+  // function RandomSymbol() {
+  //   var symbols = ["1", "2", "3", "4"];
+  //   var rand_num = Math.floor(Math.random() * (symbols.length - 1 - 0 + 1)) + 0;
+  //   return symbols[rand_num];
+  // }
+  
   useEffect(() => {
     var _url = prompt(
       "Please enter QTrobot rosbridge url:",
@@ -54,11 +57,23 @@ export default function Main(props) {
     );
   }, [url]);
   useEffect(() => {
+    setRandomElt(props.trials)
+    if(props.trials != "")  setRandomShape( <div className={props.trials[props.trial].shape} style={(props.trials[props.trial].shape === "Triangle") ?
+    { "border-bottom": `150px solid ${props.trials[props.trial].color}` }
+    : { "background-color": props.trials[props.trial].color }}>
+  </div>)
+    // console.log(randomElt)
+  },[props.trials])
+  useEffect(() => {
+  
     if (start) {
+      window.webgazer.removeMouseEventListeners();
       qtrobot.set_volume(20);
       //checket function
       const interval = setInterval(() => {
-        if (randomElt.current.shape === randomElt.current.prevShape || randomElt.current.color === randomElt.current.prevColor){
+        // console.log("Trial: ", props.trial);
+        
+        if (randomElt[props.trial-1].shape === randomElt[props.trial-1].prevShape || randomElt[props.trial-1].color === randomElt[props.trial-1].prevColor){
           props.handleWrong("Incorrect Pass")
           } else {
           props.handleWrong("Correct Pass");
@@ -66,17 +81,15 @@ export default function Main(props) {
           }
         setRandomShape(() => RandomShape());
         props.ResponseTime();        
-      }, 1500);
+      }, 1000);
       const visual_interval = setInterval(() => {
-        setTimerWidth((prev) => prev - 4);
-      }, 10);
+        setTimerWidth((prev) => prev - 8);
+      }, 20);
       return () => {
         clearInterval(interval);
         clearInterval(visual_interval);
         setTimerWidth(400);
       };
-    } else {
-      setRandomShape(() => RandomShape())
     }
   }, [props.trial]);
   useEffect(() => {
@@ -120,9 +133,13 @@ export default function Main(props) {
     };
   };
   //Random distruction function 
+  
+  
+
+  
   function randomDistruction() {
     let distruction = distructions.current[Math.floor(Math.random() * (distructions.current.length - 1 - 0 + 1))];
-    distructions.current = distructions.current.splice(distructions.current.indexOf(distruction),1)
+    distructions.current.splice(distructions.current.indexOf(distruction),1)
     switch (distruction) {
       case "yawn":
         qtrobot.show_emotion('QT/yawn', qtrobot.play_gesture('QT/yawn'));
@@ -143,7 +160,7 @@ export default function Main(props) {
   function logDistruction(type){
     props.handleDistructionData((prev) => ({
       ...prev,
-      [type] : Date.now() - prev.startTime
+      [type] : `${Date.now() - prev.startTime} (trial: ${props.trial})`
     }))
   }
   function handleClick() {
@@ -151,18 +168,18 @@ export default function Main(props) {
     // qtrobot.play_audio('sneeze');
     //qtrobot.show_emotion('QT/with_a_cold_sneezing',qtrobot.play_audio('sneeze'));
     props.ResponseTime();
-    (randomElt.current.shape === randomElt.current.prevShape || randomElt.current.color === randomElt.current.prevColor
+    (randomElt[props.trial-1].shape === randomElt[props.trial-1].prevShape || randomElt[props.trial-1].color === randomElt[props.trial-1].prevColor
     ) ? props.handleWrong("Correct Click")
       : props.handleWrong("Incorrect Click");
     setRandomShape(() => RandomShape());
     setTimerWidth(400);
   }
   function handleKeyDown(e) {
-    console.log(e.key)
-    console.log(start)
+    // console.log(e.key)
+    // console.log(start)
     if (start){
     e.preventDefault();
-    console.log(e);
+    // console.log(e);
     if (e.key === "Enter" || e.key === " "){
       
       handleClick();
@@ -175,69 +192,9 @@ export default function Main(props) {
     }
   }
   function RandomShape() {
-    let pTarget = 0.2
-    let rand = Math.random()
-    let sVc = Math.random()
-    if (!start) {
-    randomElt.current = ({
-      "shape": shapes[Math.floor(Math.random() * (shapes.length))],
-      "color": colors[Math.floor(Math.random() * (colors.length))],
-      "prevShape": randomElt.current.shape,
-      "prevColor": randomElt.current.color
-    })
-    if (rand <= pTarget){
-      count.current = count.current+1
-      console.log(count.current)
-      randomElt.current = ({
-        ...randomElt.current,
-        "nextShape" : sVc < 0.5 ? randomElt.current.shape : shapes[Math.floor(Math.random() * (shapes.length))],
-        "nextColor" : sVc >= 0.5 ? randomElt.current.color : colors[Math.floor(Math.random() * (colors.length))]
-      })
-    } else{
-      let newShape = shapes[Math.floor(Math.random()*(shapes.length))]
-      let newColor = colors[Math.floor(Math.random() * (colors.length))]
-      while (newShape === randomElt.current.shape || newColor === randomElt.current.color){
-        newShape = shapes[Math.floor(Math.random()*(shapes.length))]
-        newColor = colors[Math.floor(Math.random() * (colors.length))]
-      }
-      randomElt.current = ({
-        ...randomElt.current,
-        "nextShape" : newShape,
-        "nextColor" : newColor
-      })
-    }
-  } else {
-      randomElt.current = ({
-        "shape": randomElt.current.nextShape,
-        "color": randomElt.current.nextColor,
-        "prevShape": randomElt.current.shape,
-        "prevColor": randomElt.current.color
-      })
-      if (rand <= pTarget){
-        count.current = count.current+1
-        console.log(count.current)
-        randomElt.current = ({
-          ...randomElt.current,
-          "nextShape" : sVc < 0.5 ? randomElt.current.shape : shapes[Math.floor(Math.random() * (shapes.length))],
-          "nextColor" : sVc >= 0.5 ? randomElt.current.color : colors[Math.floor(Math.random() * (colors.length))]
-        })
-      } else{
-        let newShape = shapes[Math.floor(Math.random()*(shapes.length))]
-        let newColor = colors[Math.floor(Math.random() * (colors.length))]
-        while (newShape === randomElt.current.shape || newColor === randomElt.current.color){
-          newShape = shapes[Math.floor(Math.random()*(shapes.length))]
-          newColor = colors[Math.floor(Math.random() * (colors.length))]
-        }
-        randomElt.current = ({
-          ...randomElt.current,
-          "nextShape" : newShape,
-          "nextColor" : newColor
-        })
-      }
-    }
-    return <div className={randomElt.current.shape} style={(randomElt.current.shape === "Triangle") ?
-      { "border-bottom": `150px solid ${randomElt.current.color}` }
-      : { "background-color": randomElt.current.color }}>
+    return <div className={randomElt[props.trial].shape} style={(randomElt[props.trial].shape === "Triangle") ?
+      { "border-bottom": `150px solid ${randomElt[props.trial].color}` }
+      : { "background-color": randomElt[props.trial].color }}>
     </div>;
   }
   
@@ -250,12 +207,12 @@ export default function Main(props) {
     props.setTime(Date.now());
     props.ResponseTime();
   }
-  return (!start ? (
-    <div className="main">
+  return (randomElt !== "" ?(!start ? (
+    <div id="main" className="main">
       <img className="play-btn" onClick={() => handleStart()} src={play} alt="play"/>
     </div>
   ) : (
-    <div className="main">
+    <div id="main" className="main">
       <div className="prompt">
         {randomShape}
         {/* {props.numbers && <p>{RandomSymbol()}</p>}
@@ -270,5 +227,5 @@ export default function Main(props) {
         </span>
       </div>
     </div>
-  ))
+  )):<div className="main"><div className="loader"></div></div>)
 }
