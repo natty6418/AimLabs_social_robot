@@ -1,39 +1,35 @@
-import React, { useEffect, useRef, useState, useCallback  } from 'react';
+// Import necessary modules and styles
+import React, { useEffect, useRef, useState } from 'react';
 import "bootstrap/dist/js/bootstrap.min.js";
-import "sweetalert/dist/sweetalert.min.js"
-import { startWebgazer, setupCanvas } from './utils/webgazerUtils';
-import { handleCalibrationPointClick, handleRestart } from './utils/calibrationUtils';
-import 'bootstrap/dist/css/bootstrap.min.css'
-import './style.css'
-import calibration_instruction from './Images/calibration.png'
+import "sweetalert/dist/sweetalert.min.js";
+import { startWebgazer, setupCanvas } from '../utils/webgazerUtils';
+import { handleCalibrationPointClick, handleRestart } from '../utils/calibrationUtils';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import '../style.css';
+import calibration_instruction from './Images/calibration.png';
 import { useNavigate } from 'react-router-dom';
+
+// Define the Calibration component
 function Calibration() {
-  const webcamRef = useRef()
-  const canvasRef = useRef(null)
+  const canvasRef = useRef(null);
   const webgazer = window.webgazer;
   const bootstrap = window.bootstrap;
   const navigate = useNavigate();
-  // let canvas = null;
   window.saveDataAcrossSessions = true;
+
+  // State variables to manage calibration points and currently calibrating point
   const [calibrationPoints, setCalibrationPoints] = useState({});
   const [pointCalibrate, setPointCalibrate] = useState(0);
-  // const [helpModal, setHelpModal] = useState();
-  const helpModal = useRef(null)
-  // const [canvas, setCanvas] = useState(null)
-  // useEffect(()=>{
-  //   webgazer.setGazeListener(function(data, elapsedTime) {
-  //   if (data == null) {
-  //     return;
-  //   }
-  //   var xprediction = data.x; //these x coordinates are relative to the viewport
-  //   var yprediction = data.y; //these y coordinates are relative to the viewport
-  //   console.log(elapsedTime); //elapsed time is based on time since begin was called
-  // }).begin();
-  // }, [])
-  useEffect(()=> {
+
+  // Ref for the help modal
+  const helpModal = useRef(null);
+
+  // useEffect hook is used to run some code when the component is mounted (first rendered)
+  useEffect(() => {
     const canvas = canvasRef.current;
     helpModalShow();
     startWebgazer();
+    webgazer.showPredictionPoints(true);
     setupCanvas(canvas);
     window.addEventListener('resize', resize, false);
     return () => {
@@ -41,56 +37,58 @@ function Calibration() {
         canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
       }
       webgazer.end();
-    }
+    };
   }, []);
-  useEffect(()=>{
-    console.log("pointCalibrate useEffect: ",pointCalibrate)
-  }, [pointCalibrate])
-  function handleCalibrationPoints(updatedPoints) { 
-      
-      setCalibrationPoints((prev)=> ({
-        ...prev,
-        ...updatedPoints
-      }))
-    }
+
+  // Function to handle updating the calibration points state
+  function handleCalibrationPoints(updatedPoints) {
+    setCalibrationPoints((prev) => ({
+      ...prev,
+      ...updatedPoints,
+    }));
+  }
+
+  // Function to handle updating the currently calibrating point
   function handlePointCaliberate(value) {
-      console.log("value: ", value)
-      console.log("pointCaliberate: ", pointCalibrate)
-      setPointCalibrate(value)
-    }
-  const handleButtonClick = ((event) => {
+    setPointCalibrate(value);
+  }
+
+  // Function to handle button click (calibration point selection)
+  const handleButtonClick = (event) => {
     const buttonId = event.target.id;
-    console.log("pointCaliberate1: ", pointCalibrate);
-    handleCalibrationPointClick(buttonId, calibrationPoints, handleCalibrationPoints, pointCalibrate, handlePointCaliberate, canvasRef.current, navigate);
-  });
-  // const handleButtonClick = (event) => {
-    
-  // };
+    handleCalibrationPointClick(
+      buttonId,
+      calibrationPoints,
+      handleCalibrationPoints,
+      pointCalibrate,
+      handlePointCaliberate,
+      canvasRef.current,
+      navigate
+    );
+  };
+
+  // Function to show the help modal
   function helpModalShow() {
-    if(!helpModal.current) {
-        helpModal.current = (new bootstrap.Modal(document.getElementById('helpModal')))
+    if (!helpModal.current) {
+      helpModal.current = new bootstrap.Modal(document.getElementById('helpModal'));
     }
     helpModal.current.show();
-}
+  }
+
+  // Function to handle canvas resize
   function resize() {
-    // let canvas = canvasRef.current
-    const canvas = canvasRef.current
+    const canvas = canvasRef.current;
     let context = canvas.getContext('2d');
     context.clearRect(0, 0, canvas.width, canvas.height);
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
   }
+
+  // Render the JSX representing the Calibration component
   return (
-    // <div style={{"display":"flex", "flexDirection": "column"}}>
-    //   <h1>Calibration Component</h1>
-    //   <video ref={webcamRef} style={{ display: 'none' }} />
-    //   <button onClick={() => webgazer.showVideoPreview(true)}>Show Webcam Preview</button>
-    //   <button onClick={() => webgazer.showPredictionPoints(true)}>Show Gaze Prediction Points</button>
-    // </div>
     <>
     <canvas ref={canvasRef} id='plotting_canvas' width={500} height={500} style={{ cursor: "crosshair" }}></canvas>
     <div className="calibrationDiv">
-    {console.log("re-rendered")}
       <input type="button" className="Calibration" id="Pt1" onClick={handleButtonClick}/>
       <input type="button" className="Calibration" id="Pt2" onClick={handleButtonClick}/>
       <input type="button" className="Calibration" id="Pt3" onClick={handleButtonClick}/>

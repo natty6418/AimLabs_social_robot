@@ -6,7 +6,7 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var TrialsRouter = require("./routes/testAPI");
+var TrialsRouter = require("./routes/trialsAPI");
 var cors = require("cors");
 
 var app = express();

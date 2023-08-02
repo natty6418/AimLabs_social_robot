@@ -4,31 +4,19 @@ import { useEffect } from "react";
 import { useRef } from "react";
 import play from "../Images/play.png";
 
-//import QTrobot from './js/qtrobot-1.0.min.js';
 //randomize the distructions
 //make 20% of the shapes target per minute
+// Define the Main component
 export default function Main(props) {
   const [start, setStart] = useState(false);
   const [url, setUrl] = useState(null);
   const [qtrobot, setQtrobot] = useState({});
   const [timerWidth, setTimerWidth] = useState(400);
-
-  
   const [randomShape, setRandomShape] = useState("");
-  // const shapes = ["Circle", "Rectangle", "Triangle", "Diamond"];
-  // const colors = ["#C2DEDC", "#ECE5C7", "#B3C890", "#116A7B"];
-  // //const colors = ["green", "yellow", "red", "blue"]
-
   const distructions = useRef(["yawn", "sneeze", "sing"])
   const [randomElt, setRandomElt] = useState("");
-  // console.log("props: ", props.trials)
-  // const count = useRef(0);
-  // function RandomSymbol() {
-  //   var symbols = ["1", "2", "3", "4"];
-  //   var rand_num = Math.floor(Math.random() * (symbols.length - 1 - 0 + 1)) + 0;
-  //   return symbols[rand_num];
-  // }
   
+  // Function to connect to QTrobot using the provided URL
   useEffect(() => {
     var _url = prompt(
       "Please enter QTrobot rosbridge url:",
@@ -40,6 +28,7 @@ export default function Main(props) {
     }
     console.log("connecting to QTrobot (please wait...)");
   }, []);
+    // Function to create the QTrobot instance
   useEffect(() => {
     // eslint-disable-next-line no-undef
     setQtrobot(() => new QTrobot({
@@ -56,23 +45,23 @@ export default function Main(props) {
     })
     );
   }, [url]);
+  // Function to update the random element state when the trials data changes
   useEffect(() => {
+    if (props.trials) {
     setRandomElt(props.trials)
-    if(props.trials != "")  setRandomShape( <div className={props.trials[props.trial].shape} style={(props.trials[props.trial].shape === "Triangle") ?
+    if(props.trials !== "")  setRandomShape( <div className={props.trials[props.trial].shape} style={(props.trials[props.trial].shape === "Triangle") ?
     { "border-bottom": `150px solid ${props.trials[props.trial].color}` }
     : { "background-color": props.trials[props.trial].color }}>
-  </div>)
-    // console.log(randomElt)
+  </div>)}
   },[props.trials])
   useEffect(() => {
   
     if (start) {
       window.webgazer.removeMouseEventListeners();
-      qtrobot.set_volume(20);
-      //checket function
+      qtrobot.set_volume(20); //change to the desired volume
+      //checker function
       const interval = setInterval(() => {
-        // console.log("Trial: ", props.trial);
-        
+        //checks if the users "response" is correct or incorrect
         if (randomElt[props.trial-1].shape === randomElt[props.trial-1].prevShape || randomElt[props.trial-1].color === randomElt[props.trial-1].prevColor){
           props.handleWrong("Incorrect Pass")
           } else {
@@ -83,8 +72,8 @@ export default function Main(props) {
         props.ResponseTime();        
       }, 1000);
       const visual_interval = setInterval(() => {
-        setTimerWidth((prev) => prev - 8);
-      }, 20);
+        setTimerWidth((prev) => prev - 4);
+      }, 10); //creates a visual timer....might not be working correctly if webgazer is running
       return () => {
         clearInterval(interval);
         clearInterval(visual_interval);
@@ -93,28 +82,31 @@ export default function Main(props) {
     }
   }, [props.trial]);
   useEffect(() => {
-    //One minute interval
-    if(start) {
+    if (start) {
       const oneMinInterval = setInterval(() => {
-      const randomInterval = setRandomInterval(randomDistruction, 3000, 8000);
+        //Sends a random distruction between 30 - 45 seconds after the start of the experiment or 
+        //the last distruction.
+        const randomInterval = setRandomInterval(randomDistruction, 30000, 45000);
+        return () => {
+          randomInterval.clear();
+        };
+      }, 60000); //one distruction per minute
+
       return () => {
-        randomInterval.clear();
-      };
-    }, 10000);
-    return () => {
-      clearInterval(oneMinInterval)
-    }}
-  },[start, distructions])
+        clearInterval(oneMinInterval)
+      }
+    }
+  }, [start, distructions]);
   useEffect(() => {
     //Random interval
     if (start) {
-      const startingRandomInterval = setRandomInterval(randomDistruction, 3000, 8000);
+      const startingRandomInterval = setRandomInterval(randomDistruction, 30000, 45000);
       return () => {
         startingRandomInterval.clear();
       }; 
     }
   }, [start]);
-  //handle key down
+  //handle key down event
   useEffect (() => {
     document.addEventListener('keydown', handleKeyDown, true);
 
@@ -133,10 +125,7 @@ export default function Main(props) {
     };
   };
   //Random distruction function 
-  
-  
 
-  
   function randomDistruction() {
     let distruction = distructions.current[Math.floor(Math.random() * (distructions.current.length - 1 - 0 + 1))];
     distructions.current.splice(distructions.current.indexOf(distruction),1)
@@ -157,16 +146,17 @@ export default function Main(props) {
         qtrobot.show_emotion('yawn')
     }
   }
+
+  //logs the time and the trial at which a distruction occured
   function logDistruction(type){
     props.handleDistructionData((prev) => ({
       ...prev,
-      [type] : `${Date.now() - prev.startTime} (trial: ${props.trial})`
+      [type] : `${Date.now()} (trial: ${props.trial})`
     }))
   }
+
+  //checks if the user's click response is correct or not.
   function handleClick() {
-    // console.log(randomElt)
-    // qtrobot.play_audio('sneeze');
-    //qtrobot.show_emotion('QT/with_a_cold_sneezing',qtrobot.play_audio('sneeze'));
     props.ResponseTime();
     (randomElt[props.trial-1].shape === randomElt[props.trial-1].prevShape || randomElt[props.trial-1].color === randomElt[props.trial-1].prevColor
     ) ? props.handleWrong("Correct Click")
@@ -174,12 +164,12 @@ export default function Main(props) {
     setRandomShape(() => RandomShape());
     setTimerWidth(400);
   }
+
+  // handles enter and space key down events
   function handleKeyDown(e) {
-    // console.log(e.key)
-    // console.log(start)
+    
     if (start){
     e.preventDefault();
-    // console.log(e);
     if (e.key === "Enter" || e.key === " "){
       
       handleClick();
@@ -187,10 +177,12 @@ export default function Main(props) {
     }}
     else {
       e.preventDefault();
-      handleStart();
+      if (e.key === "Enter" || e.key === " ") handleStart();
       setTimerWidth(400);
     }
   }
+
+  //returns a random shape JSX element
   function RandomShape() {
     return <div className={randomElt[props.trial].shape} style={(randomElt[props.trial].shape === "Triangle") ?
       { "border-bottom": `150px solid ${randomElt[props.trial].color}` }
@@ -198,6 +190,7 @@ export default function Main(props) {
     </div>;
   }
   
+  //handles the start of the experiment
   function handleStart() {
     setStart(true);
     props.handleDistructionData((prev) => ({
@@ -207,7 +200,8 @@ export default function Main(props) {
     props.setTime(Date.now());
     props.ResponseTime();
   }
-  return (randomElt !== "" ?(!start ? (
+  return (props.webgazerIsSet && randomElt !== "" ? (
+    !start ? (
     <div id="main" className="main">
       <img className="play-btn" onClick={() => handleStart()} src={play} alt="play"/>
     </div>

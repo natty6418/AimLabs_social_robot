@@ -1,17 +1,13 @@
 import calculatePrecision from './precision_calculator';
 import swal from 'sweetalert';
 const webgazer = window.webgazer;
-export const handleCalibrationPointClick = (id, calibrationPoints, setCalibrationPoints, pointCalibrate, handlePointCaliberate, canvas, navigate) => {
-  // console.log("updated point: ", calibrationPoints)
-  // console.log("pointCaliberate2: ", pointCalibrate)  
+export const handleCalibrationPointClick = (id, calibrationPoints, setCalibrationPoints, pointCalibrate, handlePointCaliberate, canvas, navigate) => { 
   const updatedPoints = calibrationPoints;
   let updatedPointCaliberate = pointCalibrate
     if (!updatedPoints[id]) {
         updatedPoints[id] = 0;
       }
-      updatedPoints[id]++;
-    console.log("updatedPoints[id]: ", updatedPoints[id])
-      
+      updatedPoints[id]++;      
     if (updatedPoints[id] === 5) {
         document.getElementById(id).style.backgroundColor = 'yellow';
         document.getElementById(id).setAttribute('disabled', 'disabled');
@@ -23,7 +19,6 @@ export const handleCalibrationPointClick = (id, calibrationPoints, setCalibratio
       }
       // Show the middle calibration point after all other points have been clicked.
     if (updatedPointCaliberate === 8) {
-            console.log("style: ",document.getElementById('Pt5').style)
             document.getElementById('Pt5').style.removeProperty('display');
         }
     if (updatedPointCaliberate >= 9) {
