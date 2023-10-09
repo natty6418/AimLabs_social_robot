@@ -99,15 +99,16 @@ Functionalities:
 
 3. You can change the robot's speaker volume here.
 
-'''qtrobot.set_volume(20)'''
+```qtrobot.set_volume(20)```
 
 4. Check if previous color/shape is the same as the current one to judge the users response. This is done on a one second interval to check the shapes where the user doesn't respond to and also every time the user responds to a target.
 
 5. The small bar (visual timer) which shows the remaining time is also set here. If you decide to change the width, don't forget to change the interval in which the width is decremented with respect to time.
 
-'''const visual_interval = setInterval(() => {
+```const visual_interval = setInterval(() => {
    setTimerWidth((prev) => prev - 4);
-   }, 10);'''
+   }, 10);
+```
    
 6. The random 30-45 second interval which sends a distruction from the robot is defined here. If you decide to change this interval, change the parameters at both instances of the function. They are located in consecutive useEffect hooks in the `Main.js` component.
 
