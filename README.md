@@ -61,62 +61,62 @@ roslaunch ~/rosbridge_websocket_qtpc.launch
 
 The `App` component serves as the main entry point of the application. It defines the overall layout of the experiment, including the header and main content area.
 
-   ## 1. `Experiment.js`
+## 1. `Experiment.js`
 
-   The `Experiment` component is responsible for managing the experiment trials, recording user responses, and displaying the heatmap of gaze data. It uses several state variables to keep track of the trial number, response time, random elements, distruction data, and webgazer setup.
+The `Experiment` component is responsible for managing the experiment trials, recording user responses, and displaying the heatmap of gaze data. It uses several state variables to keep track of the trial number, response time, random elements, distruction data, and webgazer setup.
 
-   Functionalities:
-      1. check if the experiment trials are completed
-      2. fetch data from the API on component mount
-      3. Initialize and remove webgazer after calibration, and set up the heatmap
-      4. fetch data from the API
-      5. generate and display the heatmap
-      6. record the response time of each trial
-      7. download experimental data
-      8. Handles incorrect responses from the experimentee
+Functionalities:
+   1. check if the experiment trials are completed
+   2. fetch data from the API on component mount
+   3. Initialize and remove webgazer after calibration, and set up the heatmap
+   4. fetch data from the API
+   5. generate and display the heatmap
+   6. record the response time of each trial
+   7. download experimental data
+   8. Handles incorrect responses from the experimentee
 
-   Subcomponents:
-   ## 1. `Header.js`
+Subcomponents:
+## 1. `Header.js`
 
    The `Header` component represents the header section of the application, displaying experiment details such as the Experiment ID, Session number, and Trial number. It also includes a "Home" button that allows users to navigate back to the home page.
 
 
-   ## 2. `Main.js`
+## 2. `Main.js`
 
-   The `Main` component handles the main part of the experiment, where the trials are conducted. It includes functions to start the trial, handle user responses, and introduce random distructions using QTrobot.
-         This is the component which is like the engine for the experiment. This component contains several effect hooks required to run the experiment. 
-         Functionalities:
-         1. Creates a QTrobot and connects to robot's JavaScript API 
-         2. Change the displayed shape when the trial number is incremented.
-         3. You can change the robot's speaker volume here.
-         '''qtrobot.set_volume(20)'''
-         4. Check if previous color/shape is the same as the current one to judge the users response. This is done on a one second interval to check the shapes where the user doesn't respond to and also every time the user responds to a target.
-         5. The small bar (visual timer) which shows the remaining time is also set here. If you decide to change the width, don't forget to change the interval in which the width is decremented with respect to time.
-         '''const visual_interval = setInterval(() => {
-            setTimerWidth((prev) => prev - 4);
-            }, 10);'''
-         6. The random 30-45 second interval which sends a distruction from the robot is defined here. If you decide to change this interval, change the parameters at both instances of the function. They are located in consecutive useEffect hooks in the `Main.js` component.
-         7. The user can respond using either the keyboard or the mouse. Both event listenters (keydown and mouseclick) are defined here. 
-         8. Random distruction fucntion is defined here. Read through the qtrobot JavaScript api documentation and make modifications to this area. You can send predefined or custom distructions here. Distructions can be emotions, gestures or audio responses.
-         9. Function to log the sent distructions to the data being collected is defined here.
-         10. Function to display random shape is defined here.
-         11. Function to handle the start of the experiment is defined here. Various states must be initialized at the start of the experiment.
-   ## 2. `Calibration.js`
+The `Main` component handles the main part of the experiment, where the trials are conducted. It includes functions to start the trial, handle user responses, and introduce random distructions using QTrobot.
+      This is the component which is like the engine for the experiment. This component contains several effect hooks required to run the experiment. 
+      Functionalities:
+      1. Creates a QTrobot and connects to robot's JavaScript API 
+      2. Change the displayed shape when the trial number is incremented.
+      3. You can change the robot's speaker volume here.
+      '''qtrobot.set_volume(20)'''
+      4. Check if previous color/shape is the same as the current one to judge the users response. This is done on a one second interval to check the shapes where the user doesn't respond to and also every time the user responds to a target.
+      5. The small bar (visual timer) which shows the remaining time is also set here. If you decide to change the width, don't forget to change the interval in which the width is decremented with respect to time.
+      '''const visual_interval = setInterval(() => {
+         setTimerWidth((prev) => prev - 4);
+         }, 10);'''
+      6. The random 30-45 second interval which sends a distruction from the robot is defined here. If you decide to change this interval, change the parameters at both instances of the function. They are located in consecutive useEffect hooks in the `Main.js` component.
+      7. The user can respond using either the keyboard or the mouse. Both event listenters (keydown and mouseclick) are defined here. 
+      8. Random distruction fucntion is defined here. Read through the qtrobot JavaScript api documentation and make modifications to this area. You can send predefined or custom distructions here. Distructions can be emotions, gestures or audio responses.
+      9. Function to log the sent distructions to the data being collected is defined here.
+      10. Function to display random shape is defined here.
+      11. Function to handle the start of the experiment is defined here. Various states must be initialized at the start of the experiment.
+## 2. `Calibration.js`
 
-   The `Calibration` component in this project is responsible for calibrating the eye-tracking system before starting the actual experiment. When users access the calibration page, the application displays calibration points on the screen, and users are required to focus their gaze on each point to calibrate the eye-tracking system accurately. The calibration points are represented as buttons, and when clicked, the eye tracker records the gaze position for each point.
+The `Calibration` component in this project is responsible for calibrating the eye-tracking system before starting the actual experiment. When users access the calibration page, the application displays calibration points on the screen, and users are required to focus their gaze on each point to calibrate the eye-tracking system accurately. The calibration points are represented as buttons, and when clicked, the eye tracker records the gaze position for each point.
 
-   **IMPORTANT: Once calibrated the app can be made to use the old calibration data for the experiment. You don't have to recalibrate it for every session.**
-   
-   ## Eye Tracking and Data Collection
+**IMPORTANT: Once calibrated the app can be made to use the old calibration data for the experiment. You don't have to recalibrate it for every session.**
 
-   The eye tracking functionality is implemented using the `webgazer.js` library. The gaze data is stored in the `heatmapData` array, which is then used to generate a heatmap using the `heatmap.js` library.
-   Webgazer utility components can be located at `my-app\App\src\utils.
-   
-   This is where the different components that run the eyetracker are defined. Read more about webgazer here;
-            * `https://webgazer.cs.brown.edu/`
-            * `https://github.com/brownhci/WebGazer`
-   ## 3. Home.js
-   This is component where the home page is defined. The home page is where the emperiment details are defined and set. Experiment number and session number are set here.
+## Eye Tracking and Data Collection
+
+The eye tracking functionality is implemented using the `webgazer.js` library. The gaze data is stored in the `heatmapData` array, which is then used to generate a heatmap using the `heatmap.js` library.
+Webgazer utility components can be located at `my-app\App\src\utils.
+
+This is where the different components that run the eyetracker are defined. Read more about webgazer here;
+         * `https://webgazer.cs.brown.edu/`
+         * `https://github.com/brownhci/WebGazer`
+## 3. Home.js
+This is component where the home page is defined. The home page is where the emperiment details are defined and set. Experiment number and session number are set here.
 ## Data Collection
 
 The `Experiment` component handles data collection during the experiment trials, including raw gaze data (coordinates) in addition to other metrics:
