@@ -30,6 +30,7 @@ export default function Main(props) {
   }, []);
     // Function to create the QTrobot instance
   useEffect(() => {
+    //DO NOT Remove Or Move the following comment
     // eslint-disable-next-line no-undef
     setQtrobot(() => new QTrobot({
       url: url,
@@ -112,7 +113,8 @@ export default function Main(props) {
 
     return () => document.removeEventListener('keydown', handleKeyDown,true)
   }, [start, props.trial]); 
-  //random interval function
+  //random interval function. Takes minimum and maximum delay parameters 
+  //to create a random interval in the specified range.
   const setRandomInterval = (intervalFunction, minDelay, maxDelay) => {
     let timeout;
     const timeoutFunction = () => {

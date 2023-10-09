@@ -70,7 +70,8 @@ export default function Experiment(props) {
     setupHeatmap();
     webgazer.setGazeListener(eyeListener);
 
-    return () => {
+    return () => { //anything in the return statement will be executed when the component unmounts.  
+      //the useEffect return function returns a function, the returned function is called cleanup. cleanup is run before the effect is reached (to clean up effects from previous renders).
       removeWebgazer();
     }
   }, []);
@@ -78,7 +79,8 @@ export default function Experiment(props) {
   // Function to fetch data from the API
   const fetchDataFromApi = async () => {
     try {
-      const response = await fetch(`http://localhost:9000/api/trials/${"shapes"}`);
+      /*NEW!!!! */
+      const response = await fetch(`http://localhost:9000/api/trials/${props.targetType}`); //fetches data from api based on the target type.
       const trials = await response.json();
       return trials;
     } catch (error) {

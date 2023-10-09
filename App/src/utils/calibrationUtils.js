@@ -66,9 +66,11 @@ export const handleCalibrationPointClick = (id, calibrationPoints, setCalibratio
                 navigate('/experiment');
               } else {
                 webgazer.clearData();
-                ClearCalibration(setCalibrationPoints, handlePointCaliberate);
-                ClearCanvas(canvas);
-                ShowCalibrationPoint();
+                /*NEW!!! */
+                window.location.reload(false);
+                // ClearCalibration(setCalibrationPoints, handlePointCaliberate);
+                // ClearCanvas(canvas);
+                // ShowCalibrationPoint();
               }
             });
           }, 5000);
