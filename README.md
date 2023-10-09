@@ -134,8 +134,9 @@ The eye tracking functionality is implemented using the `webgazer.js` library. T
 Webgazer utility components can be located at `my-app\App\src\utils.
 
 This is where the different components that run the eyetracker are defined. Read more about webgazer here;
-         * `https://webgazer.cs.brown.edu/`
-         * `https://github.com/brownhci/WebGazer`
+* https://webgazer.cs.brown.edu/
+  
+* https://github.com/brownhci/WebGazer
 ## 3. Home.js
 This is component where the home page is defined. The home page is where the emperiment details are defined and set. Experiment number and session number are set here.
 ## Data Collection
