@@ -61,11 +61,11 @@ roslaunch ~/rosbridge_websocket_qtpc.launch
 
 The `App` component serves as the main entry point of the application. It defines the overall layout of the experiment, including the header and main content area.
 
-      ## 1. `Experiment.js`
+   ## 1. `Experiment.js`
 
-      The `Experiment` component is responsible for managing the experiment trials, recording user responses, and displaying the heatmap of gaze data. It uses several state variables to keep track of the trial number, response time, random elements, distruction data, and webgazer setup.
+   The `Experiment` component is responsible for managing the experiment trials, recording user responses, and displaying the heatmap of gaze data. It uses several state variables to keep track of the trial number, response time, random elements, distruction data, and webgazer setup.
 
-      Functionalities:
+   Functionalities:
       1. check if the experiment trials are completed
       2. fetch data from the API on component mount
       3. Initialize and remove webgazer after calibration, and set up the heatmap
@@ -75,15 +75,15 @@ The `App` component serves as the main entry point of the application. It define
       7. download experimental data
       8. Handles incorrect responses from the experimentee
 
-      Subcomponents:
-         ## 1. `Header.js`
+   Subcomponents:
+   ## 1. `Header.js`
 
-         The `Header` component represents the header section of the application, displaying experiment details such as the Experiment ID, Session number, and Trial number. It also includes a "Home" button that allows users to navigate back to the home page.
+   The `Header` component represents the header section of the application, displaying experiment details such as the Experiment ID, Session number, and Trial number. It also includes a "Home" button that allows users to navigate back to the home page.
 
 
-         ## 2. `Main.js`
+   ## 2. `Main.js`
 
-         The `Main` component handles the main part of the experiment, where the trials are conducted. It includes functions to start the trial, handle user responses, and introduce random distructions using QTrobot.
+   The `Main` component handles the main part of the experiment, where the trials are conducted. It includes functions to start the trial, handle user responses, and introduce random distructions using QTrobot.
          This is the component which is like the engine for the experiment. This component contains several effect hooks required to run the experiment. 
          Functionalities:
          1. Creates a QTrobot and connects to robot's JavaScript API 
@@ -103,16 +103,16 @@ The `App` component serves as the main entry point of the application. It define
          11. Function to handle the start of the experiment is defined here. Various states must be initialized at the start of the experiment.
    ## 2. `Calibration.js`
 
-      The `Calibration` component in this project is responsible for calibrating the eye-tracking system before starting the actual experiment. When users access the calibration page, the application displays calibration points on the screen, and users are required to focus their gaze on each point to calibrate the eye-tracking system accurately. The calibration points are represented as buttons, and when clicked, the eye tracker records the gaze position for each point.
+   The `Calibration` component in this project is responsible for calibrating the eye-tracking system before starting the actual experiment. When users access the calibration page, the application displays calibration points on the screen, and users are required to focus their gaze on each point to calibrate the eye-tracking system accurately. The calibration points are represented as buttons, and when clicked, the eye tracker records the gaze position for each point.
 
-      **IMPORTANT: Once calibrated the app can be made to use the old calibration data for the experiment. You don't have to recalibrate it for every session.**
-      
-      ## Eye Tracking and Data Collection
+   **IMPORTANT: Once calibrated the app can be made to use the old calibration data for the experiment. You don't have to recalibrate it for every session.**
+   
+   ## Eye Tracking and Data Collection
 
-      The eye tracking functionality is implemented using the `webgazer.js` library. The gaze data is stored in the `heatmapData` array, which is then used to generate a heatmap using the `heatmap.js` library.
-      Webgazer utility components can be located at `my-app\App\src\utils.
-      
-      This is where the different components that run the eyetracker are defined. Read more about webgazer here;
+   The eye tracking functionality is implemented using the `webgazer.js` library. The gaze data is stored in the `heatmapData` array, which is then used to generate a heatmap using the `heatmap.js` library.
+   Webgazer utility components can be located at `my-app\App\src\utils.
+   
+   This is where the different components that run the eyetracker are defined. Read more about webgazer here;
             * `https://webgazer.cs.brown.edu/`
             * `https://github.com/brownhci/WebGazer`
    ## 3. Home.js
